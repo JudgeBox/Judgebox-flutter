@@ -15,12 +15,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
         curve: Curves.easeInOutCubic,
         duration: const Duration(milliseconds: 500),
         width: 350,
-        margin: const EdgeInsets.only(bottom: 10, top: 10),
+        margin: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
         decoration: const BoxDecoration(
-          borderRadius: BorderRadius.only(
-            bottomRight: Radius.circular(10),
-            topRight: Radius.circular(10),
-          ),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
           color: Color.fromRGBO(20, 20, 20, 1),
         ),
         child: Column(
