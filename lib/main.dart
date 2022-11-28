@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:judgebox/responsive/responsive_layout.dart';
 import 'package:judgebox/responsive/mobile/mobile_scaffold.dart';
 import 'package:judgebox/responsive/tablet_scaffold.dart';
-import 'package:judgebox/responsive/web_scaffold.dart';
+import 'package:judgebox/responsive/web/web_scaffold.dart';
 
 void main() {
   runApp(const MyApp());
