@@ -42,7 +42,6 @@ class _WebBody extends State<WebBody> {
                 ])
               ],
             ),
-
             Row(children: [
               Container(
                 width: 300,
@@ -77,7 +76,56 @@ class _WebBody extends State<WebBody> {
                 child: Container(),
               )
             ]),
+            SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  alignment: Alignment.topLeft,
+                  child: const Text(
+                    "題目列表",
+                    style: TextStyle(fontSize: 24),
+                  ),
+                ),
+                Row(children: [
+                  Container(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                        icon: Icon(Icons.arrow_left), onPressed: () {}),
+                  ),
+                  Container(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                        icon: Icon(Icons.arrow_right), onPressed: () {}),
+                  ),
+                  SizedBox(width: 30),
+                ])
+              ],
+            ),
+            ProblemList(),
           ])),
+    );
+  }
+}
+
+
+class ProblemList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      padding: EdgeInsets.only(right: 50),
+      shrinkWrap: true,
+      itemCount: 6,
+      itemBuilder: (BuildContext context, int index) {
+        return ListTile(
+            leading: Icon(Icons.add_to_home_screen),
+            title: Text("題目名稱"),
+            trailing: Icon(Icons.keyboard_arrow_right),
+        );
+      },
+      separatorBuilder: (BuildContext context, int index) {
+        return Divider(color: Colors.blue);
+      },
     );
   }
 }
