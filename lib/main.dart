@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:judgebox/responsive/responsive_layout.dart';
-import 'package:judgebox/responsive/mobile/mobile_scaffold.dart';
-import 'package:judgebox/responsive/tablet_scaffold.dart';
-import 'package:judgebox/responsive/web/web_scaffold.dart';
+import 'package:judgebox/responsive/responsiveLayout.dart';
+import 'package:judgebox/responsive/mobile/mobileScaffold.dart';
+import 'package:judgebox/responsive/tabletScaffold.dart';
+import 'package:judgebox/responsive/web/webScaffold.dart';
 
 void main() {
   runApp(const MyApp());
