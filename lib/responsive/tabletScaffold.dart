@@ -13,7 +13,6 @@ class _TabletScaffoldState extends State<TabletScaffold> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: judgeBackground,
-      appBar: webAppBar,
       body: Row(
         children: [
         ],

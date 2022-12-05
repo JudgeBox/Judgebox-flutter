@@ -8,9 +8,6 @@ var mobileAppBar = AppBar(
   backgroundColor: Colors.black54,
 );
 
-var webAppBar = AppBar(
-  backgroundColor: Colors.black26,
-);
 
 var judgeDrawer = Drawer(
   backgroundColor: Colors.grey[300],
