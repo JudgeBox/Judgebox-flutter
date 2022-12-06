@@ -9,7 +9,7 @@ class NoteBody extends StatefulWidget {
   @override
   State<NoteBody> createState() => _NoteBody();
 }
-
+//文字方塊
 class _NoteBody extends State<NoteBody> {
   @override
   Widget build(BuildContext context) {
@@ -22,12 +22,25 @@ class _NoteBody extends State<NoteBody> {
                 painter: PointPainter(),
                 child: Container(
                   child: GestureDetector(
+                    onPanDown: (details) {
+                      // Handle the user's mouse down event
+                    },
                     onPanUpdate: (details) {
                       RenderBox? box = context.findRenderObject() as RenderBox;
                       PointPainter.points.add(box.globalToLocal(details.globalPosition));
                       setState(() {});
                     },
-                  ),
+                    child: Container(
+                      // Use a Container widget to set the background color and size of the text field
+                      color: Colors.blue,
+                      width: 300,
+                      height: 200,
+                      child: TextField(
+                        maxLines: 3, // This will create a multi-line text field with 3 lines
+                      ),
+                    ),
+                  )
+                  ,
                 ),
               );
             })),
@@ -43,7 +56,7 @@ class PointPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     var paint = Paint()
       ..color = Colors.red
-      ..strokeWidth = 4.0
+      ..strokeWidth = 20.0
       ..strokeCap = StrokeCap.round;
     for (int i = 0; i < points.length; i++) {
       if (points[i] != null) canvas.drawPoints(PointMode.points, [points[i]], paint);
