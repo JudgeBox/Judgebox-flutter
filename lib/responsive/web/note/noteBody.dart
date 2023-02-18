@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:judgebox/constants.dart';
 
 class NoteBody extends StatefulWidget {
   const NoteBody({Key? key}) : super(key: key);
@@ -22,15 +21,13 @@ class _NoteBody extends State<NoteBody> {
     });
   }
 
-  late List<FocusNode> textFocusNode;
-
   late List<List<Widget>> pages;
 
   @override
   void initState() {
     super.initState();
     // Initialize pages with a single page.
-    pages = [
+    pages = const [
       [
         PainterContainer(),
         TextContainer(),
@@ -40,10 +37,6 @@ class _NoteBody extends State<NoteBody> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> notes = [
-      PainterContainer(),
-      TextContainer(),
-    ];
     // if (!_isTop) {
     //   for(var i = 0; i < page.length; i++) {
     //     page[i] = page[i].reversed.toList();
@@ -51,28 +44,14 @@ class _NoteBody extends State<NoteBody> {
     //   //notes = notes.reversed.toList();
     // }
     return Scaffold(
-      body: Stack(
+      body: Row(
         children: <Widget>[
-          Expanded(
-            child: PageView.builder(
-              itemCount: pages.length,
-              itemBuilder: (context, index) {
-                return Container(
-                  padding: EdgeInsets.only(left: 250, right: 250),
-                  color: Colors.white,
-                  child: Stack(
-                    children: pages[index],
-                  ),
-                );
-              },
-            ),
-          ),
           Column(
             children: [
               Column(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.menu),
+                    icon: const Icon(Icons.menu),
                     onPressed: () {
                       setState(() {
                         pages = pages
@@ -82,21 +61,53 @@ class _NoteBody extends State<NoteBody> {
                     },
                   ),
                   IconButton(
-                    icon: Icon(Icons.add),
+                    icon: const Icon(Icons.add),
                     onPressed: () {
                       setState(() {
                         // Add a new page to the end of the list.
-                        print(pages.length);
-                        pages.add([
-                          PainterContainer(),
-                          TextContainer(),
-                        ]);
+                        pages += const [
+                          [
+                            PainterContainer(),
+                            TextContainer(),
+                          ]
+                        ];
                       });
                     },
                   ),
                 ],
               ),
             ],
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: pages.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  color: Colors.white,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 250, right: 250, top: 10),
+                        child: Column(
+                          children: [
+                            Text('Page ${index + 1}'),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              height: MediaQuery.of(context).size.height / 1.5,
+                              child: Stack(
+                                children: pages[index],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      const Divider()
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -114,19 +125,16 @@ class PainterContainer extends StatefulWidget {
 class _PainterContainer extends State<PainterContainer> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: CustomPaint(
+    return CustomPaint(
       painter: PointPainter(),
-      child: Container(
-        child: GestureDetector(
-          onPanUpdate: (details) {
-            RenderBox? box = context.findRenderObject() as RenderBox;
-            PointPainter.points.add(box.globalToLocal(details.globalPosition));
-            setState(() {});
-          },
-        ),
+      child: GestureDetector(
+        onPanUpdate: (details) {
+          RenderBox? box = context.findRenderObject() as RenderBox;
+          PointPainter.points.add(box.globalToLocal(details.globalPosition));
+          setState(() {});
+        },
       ),
-    ));
+    );
   }
 }
 
@@ -140,8 +148,7 @@ class PointPainter extends CustomPainter {
       ..strokeWidth = 4.0
       ..strokeCap = StrokeCap.round;
     for (int i = 0; i < points.length; i++) {
-      if (points[i] != null)
-        canvas.drawPoints(PointMode.points, [points[i]], paint);
+      canvas.drawPoints(PointMode.points, [points[i]], paint);
     }
   }
 
@@ -195,10 +202,10 @@ class _TextContainer extends State<TextContainer> {
             )));
 
     return Container(
-        padding: EdgeInsets.only(top: 20),
+        padding: const EdgeInsets.only(top: 20),
         decoration: BoxDecoration(
           color: Colors.transparent,
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(10),
               topRight: Radius.circular(10),
               bottomLeft: Radius.circular(10),
@@ -208,11 +215,10 @@ class _TextContainer extends State<TextContainer> {
               color: Colors.white.withOpacity(0.5),
               spreadRadius: 5,
               blurRadius: 7,
-              offset: Offset(0, 3), // changes position of shadow
+              offset: const Offset(0, 3), // changes position of shadow
             ),
           ],
         ),
-        child:
-            ListView(padding: const EdgeInsets.all(8.0), children: textFields));
+        child: Wrap(spacing: 8, children: textFields));
   }
 }

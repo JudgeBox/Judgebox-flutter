@@ -21,6 +21,9 @@ class MyApp extends StatelessWidget {
         tabletScaffold: const TabletScaffold(),
         webScaffold: const WebScaffold(),
       ),
+      theme: ThemeData(
+        useMaterial3: true
+      )
     );
   }
 }
