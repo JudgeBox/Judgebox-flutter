@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:judgebox/constants.dart';
 import 'package:judgebox/responsive/web/webBody.dart';
-import 'package:judgebox/responsive/web/note/noteScaffold.dart';
+import 'package:judgebox/responsive/web/note/noteBody.dart';
 
 class WebScaffold extends StatefulWidget {
   const WebScaffold({Key? key}) : super(key: key);
@@ -25,7 +25,7 @@ class _WebScaffoldState extends State<WebScaffold> {
                 TextButton(
                   onPressed: () {
                     // This is the callback that will be called when the user taps on the text
-                    var destinationPage = NoteScaffold();
+                    var destinationPage = NoteBody();
                     // Push the destination page onto the navigation stack
                     Navigator.push(
                       context,

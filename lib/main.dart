@@ -1,10 +1,16 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:judgebox/responsive/responsiveLayout.dart';
 import 'package:judgebox/responsive/mobile/mobileScaffold.dart';
 import 'package:judgebox/responsive/tabletScaffold.dart';
 import 'package:judgebox/responsive/web/webScaffold.dart';
 
-void main() {
+import 'firebase_options.dart';
+
+void main() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 

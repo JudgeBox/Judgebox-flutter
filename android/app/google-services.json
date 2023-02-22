@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "636742482053",
+    "project_id": "judgebox-58246",
+    "storage_bucket": "judgebox-58246.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:636742482053:android:ca8f83167c9fcfd3a911ec",
+        "android_client_info": {
+          "package_name": "com.example.judgebox"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "636742482053-73u0e5q982rc02i3jav7m7ltoq75l15b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDif4SD9SIzfUJ44ePiMqiXhz7KPuBHe04"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "636742482053-73u0e5q982rc02i3jav7m7ltoq75l15b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
