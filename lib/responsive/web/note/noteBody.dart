@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:judgebox/constants.dart';
 import 'package:judgebox/responsive/web/note/paintBody.dart';
+import 'package:judgebox/responsive/web/note/textBody.dart';
 
 class NoteBody extends StatefulWidget {
   const NoteBody({Key? key}) : super(key: key);
-
+  static List<List<String>> tmpText = <List<String>>[];
   @override
   State<NoteBody> createState() => _NoteBody();
 }
@@ -19,6 +20,7 @@ class _NoteBody extends State<NoteBody> {
   final textBoxKey = GlobalKey();
   bool _isTop = true;
 
+
   void _changeOrder() {
     setState(() {
       _isTop = !_isTop;
@@ -26,15 +28,15 @@ class _NoteBody extends State<NoteBody> {
   }
 
   late List<List<Widget>> pages;
-
   @override
   void initState() {
+    NoteBody.tmpText.add(List.generate(10, (index) => ''));
     super.initState();
     // Initialize pages with a single page.
-    pages = const [
+    pages = [
       [
         PainterContainer(id: 0),
-        TextContainer(id: 0),
+        TextContainer(id: 0, tmpText: NoteBody.tmpText[0],),
       ],
     ];
   }
@@ -51,10 +53,19 @@ class _NoteBody extends State<NoteBody> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black26,
+        title: Container(
+          padding: EdgeInsets.symmetric(horizontal: screenPadding),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Enter text here',
+            ),
+          ),
+        ),
         actions: <Widget>[
           TextButton(
             onPressed: () async {
               PainterContainer(id: 0).save();
+              TextContainer(id: 0, tmpText: NoteBody.tmpText[0],).save();
             },
             child: Text("Save"),
           ),
@@ -86,9 +97,9 @@ class _NoteBody extends State<NoteBody> {
                         int len = pages.length;
                         pages += _isTop ? [[
                             PainterContainer(id: len),
-                            TextContainer(id: len),
+                            TextContainer(id: len, tmpText: NoteBody.tmpText[len],),
                           ]] : [[
-                            TextContainer(id: len),
+                            TextContainer(id: len, tmpText: NoteBody.tmpText[len]),
                             PainterContainer(id: len),
                         ]
                         ];
@@ -137,69 +148,3 @@ class _NoteBody extends State<NoteBody> {
 
 }
 
-class TextContainer extends StatefulWidget {
-  final int id;
-
-  const TextContainer({Key? key, required this.id}) : super(key: key);
-
-  @override
-  State<TextContainer> createState() => _TextContainer();
-}
-
-class _TextContainer extends State<TextContainer> {
-  @override
-  Widget build(BuildContext context) {
-    int id = widget.id;
-    int listLength = 10;
-    List<FocusNode> _focusNodes =
-        List<FocusNode>.generate(listLength, (int index) => FocusNode());
-
-    List<Widget> textFields = List<Widget>.generate(
-        listLength,
-        (int index) => RawKeyboardListener(
-            focusNode: FocusNode(),
-            onKey: (event) {
-              if (event is RawKeyDownEvent) {
-                if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-                  _focusNodes[index - 1].requestFocus();
-                } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-                  _focusNodes[index + 1].requestFocus();
-                }
-              }
-            },
-            child: TextField(
-              controller: TextEditingController(),
-              focusNode: _focusNodes[index],
-              onSubmitted: (String value) {
-                if (index < listLength) {
-                  _focusNodes[index + 1].requestFocus();
-                }
-              },
-              onChanged: (value) {
-                if (value.contains('\n')) {
-                  _focusNodes[index + 1].requestFocus();
-                }
-              },
-            )));
-
-    return Container(
-        padding: const EdgeInsets.only(top: 20),
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
-              bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.white.withOpacity(0.5),
-              spreadRadius: 5,
-              blurRadius: 7,
-              offset: const Offset(0, 3), // changes position of shadow
-            ),
-          ],
-        ),
-        child: Wrap(spacing: 8, children: textFields));
-  }
-}

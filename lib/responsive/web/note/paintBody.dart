@@ -30,7 +30,6 @@ class _PainterContainer extends State<PainterContainer> {
               child: GestureDetector(
                 onPanUpdate: (details) {
                   setState(() {
-
                     PointPainter.points.add(PaintData(
                       position: details.localPosition,
                       color: Colors.red,
