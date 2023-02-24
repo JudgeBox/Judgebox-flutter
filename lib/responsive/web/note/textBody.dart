@@ -12,7 +12,7 @@ class TextContainer extends StatefulWidget {
   @override
   State<TextContainer> createState() => _TextContainerState();
   @override
-  Future<void> save() => _TextContainerState()._saveText();
+  Future<void> save() => _TextContainerState()._saveText(id);
 }
 
 class _TextContainerState extends State<TextContainer> {
@@ -23,8 +23,9 @@ class _TextContainerState extends State<TextContainer> {
   void initState() {
     super.initState();
     for (int i = 0; i < 10; i++) {
-      _controllers.add(TextEditingController(text: widget.tmpText[i]));
+      _controllers.add(TextEditingController(text: ""));
     }
+    _loadText();
   }
 
   @override
@@ -35,9 +36,17 @@ class _TextContainerState extends State<TextContainer> {
     super.dispose();
   }
 
-  Future<void> _saveText() async {
-    print("A");
-    await _firestore.collection('NoteText').add({'Text': NoteBody.tmpText[0]});
+  Map<String, dynamic> toMap(List<String> list) {
+    Map<String, dynamic> result = {};
+    for (int i = 0; i < list.length; i++) {
+      result['item$i'] = list[i];
+    }
+    return result;
+  }
+
+  Future<void> _saveText(int id) async {
+    final List<String> text = NoteBody.tmpText[id];
+    await _firestore.collection('NoteText').add({'Text': text});
   }
 
   Future<void> _loadText() async {
@@ -46,17 +55,21 @@ class _TextContainerState extends State<TextContainer> {
       final data = snapshot.docs.first.data();
       if (data.containsKey('Text')) {
         final List<dynamic> text = data['Text'];
-        final List<List<String>> tmpText = List.castFrom<dynamic, List<String>>(text);
-        setState(() {
-          NoteBody.tmpText[widget.id] = tmpText[widget.id];
-        });
+        if (text != null) {
+          final List<String> tmpText = List.castFrom<dynamic, String>(text);
+          setState(() {
+            NoteBody.tmpText[widget.id] = tmpText;
+            for (int i = 0; i < 10; i++) {
+              _controllers[i] = TextEditingController(text: tmpText[i]);
+            }
+          });
+        }
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    _loadText();
     int id = widget.id;
     List<String> tmpText = widget.tmpText;
 
@@ -85,9 +98,6 @@ class _TextContainerState extends State<TextContainer> {
               }
             },
             onChanged: (value) {
-              if (value.contains('\n')) {
-                _focusNodes[index + 1].requestFocus();
-              }
               NoteBody.tmpText[id][index] = value;
             },
           ),

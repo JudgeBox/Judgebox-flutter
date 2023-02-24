@@ -19,8 +19,13 @@ class _PainterContainer extends State<PainterContainer> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     _loadPoints();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     int id = widget.id;
     return LayoutBuilder(
         builder: (context, constraints) {

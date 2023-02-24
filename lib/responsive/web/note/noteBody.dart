@@ -43,9 +43,7 @@ class _NoteBody extends State<NoteBody> {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-    final PainterContainer paint;
-    // 設定左右間距比例
+    final Size size = MediaQuery.of(context).size; // 設定左右間距比例
     final double Ratio = 0.1;
 
     // 計算新的左右間距值
@@ -95,6 +93,7 @@ class _NoteBody extends State<NoteBody> {
                       setState(() {
                         // Add a new page to the end of the list.
                         int len = pages.length;
+                        NoteBody.tmpText.add(List.generate(10, (index) => ''));
                         pages += _isTop ? [[
                             PainterContainer(id: len),
                             TextContainer(id: len, tmpText: NoteBody.tmpText[len],),
