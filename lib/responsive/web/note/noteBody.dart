@@ -9,17 +9,16 @@ import 'package:judgebox/responsive/web/note/textBody.dart';
 class NoteBody extends StatefulWidget {
   const NoteBody({Key? key}) : super(key: key);
   static List<List<String>> tmpText = <List<String>>[];
+  static List<List<PaintData>> tmpPaint = <List<PaintData>>[];
+
   @override
   State<NoteBody> createState() => _NoteBody();
 }
-
-
 
 class _NoteBody extends State<NoteBody> {
   final buttonKey = GlobalKey();
   final textBoxKey = GlobalKey();
   bool _isTop = true;
-
 
   void _changeOrder() {
     setState(() {
@@ -28,6 +27,7 @@ class _NoteBody extends State<NoteBody> {
   }
 
   late List<List<Widget>> pages;
+
   @override
   void initState() {
     NoteBody.tmpText.add(List.generate(10, (index) => ''));
@@ -35,14 +35,15 @@ class _NoteBody extends State<NoteBody> {
     // Initialize pages with a single page.
     pages = [
       [
-        PainterContainer(id: 0),
-        TextContainer(id: 0, tmpText: NoteBody.tmpText[0],),
+        PainterContainer(id: 0, title: ""),
+        TextContainer(id: 0, tmpText: NoteBody.tmpText[0], title: ""),
       ],
     ];
   }
 
   @override
   Widget build(BuildContext context) {
+    final title = TextEditingController();
     final Size size = MediaQuery.of(context).size; // 設定左右間距比例
     final double Ratio = 0.1;
 
@@ -54,6 +55,7 @@ class _NoteBody extends State<NoteBody> {
         title: Container(
           padding: EdgeInsets.symmetric(horizontal: screenPadding),
           child: TextField(
+            controller: title,
             decoration: InputDecoration(
               hintText: 'Enter text here',
             ),
@@ -62,8 +64,34 @@ class _NoteBody extends State<NoteBody> {
         actions: <Widget>[
           TextButton(
             onPressed: () async {
-              PainterContainer(id: 0).save();
-              TextContainer(id: 0, tmpText: NoteBody.tmpText[0],).save();
+              if(title.text == "") {
+                showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: const Text('No Title'),
+                      content: const Text('Add title to save data'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, 'OK'),
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    ),
+                );
+                return;
+              }
+              for (int i = 0; i < NoteBody.tmpText.length; i++) {
+                PainterContainer(
+                  id: i,
+                  title: title.text,
+                ).save();
+                TextContainer(
+                  id: i,
+                  tmpText: NoteBody.tmpText[i],
+                  title: title.text,
+                ).save();
+                Navigator.pop(context);
+              }
             },
             child: Text("Save"),
           ),
@@ -83,6 +111,7 @@ class _NoteBody extends State<NoteBody> {
                         pages = pages
                             .map((page) => page.reversed.toList())
                             .toList();
+                        //print(NoteBody.tmpText[0]);
                         _changeOrder();
                       });
                     },
@@ -91,17 +120,33 @@ class _NoteBody extends State<NoteBody> {
                     icon: const Icon(Icons.add),
                     onPressed: () {
                       setState(() {
-                        // Add a new page to the end of the list.
                         int len = pages.length;
                         NoteBody.tmpText.add(List.generate(10, (index) => ''));
-                        pages += _isTop ? [[
-                            PainterContainer(id: len),
-                            TextContainer(id: len, tmpText: NoteBody.tmpText[len],),
-                          ]] : [[
-                            TextContainer(id: len, tmpText: NoteBody.tmpText[len]),
-                            PainterContainer(id: len),
-                        ]
-                        ];
+                        pages += _isTop
+                            ? [
+                                [
+                                  PainterContainer(
+                                    id: len + 1,
+                                    title: title.text,
+                                  ),
+                                  TextContainer(
+                                      id: len,
+                                      tmpText: NoteBody.tmpText[len - 1],
+                                      title: title.text),
+                                ]
+                              ]
+                            : [
+                                [
+                                  TextContainer(
+                                      id: len,
+                                      tmpText: NoteBody.tmpText[len - 1],
+                                      title: title.text),
+                                  PainterContainer(
+                                    id: len,
+                                    title: title.text,
+                                  ),
+                                ]
+                              ];
                       });
                     },
                   ),
@@ -144,6 +189,4 @@ class _NoteBody extends State<NoteBody> {
       ),
     );
   }
-
 }
-

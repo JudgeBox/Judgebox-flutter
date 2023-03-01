@@ -7,12 +7,14 @@ import 'package:judgebox/responsive/web/note/noteBody.dart';
 class TextContainer extends StatefulWidget {
   final int id;
   final List<String> tmpText;
-  const TextContainer({Key? key, required this.id, required this.tmpText}) : super(key: key);
+  final String title;
+  const TextContainer({Key? key, required this.id, required this.tmpText, required this.title}) : super(key: key);
+
 
   @override
   State<TextContainer> createState() => _TextContainerState();
   @override
-  Future<void> save() => _TextContainerState()._saveText(id);
+  Future<void> save() => _TextContainerState()._saveText(id, title);
 }
 
 class _TextContainerState extends State<TextContainer> {
@@ -23,9 +25,9 @@ class _TextContainerState extends State<TextContainer> {
   void initState() {
     super.initState();
     for (int i = 0; i < 10; i++) {
-      _controllers.add(TextEditingController(text: ""));
+      _controllers.add(TextEditingController(text: NoteBody.tmpText[widget.id][i]));
     }
-    _loadText();
+    //_loadText();
   }
 
   @override
@@ -36,21 +38,15 @@ class _TextContainerState extends State<TextContainer> {
     super.dispose();
   }
 
-  Map<String, dynamic> toMap(List<String> list) {
-    Map<String, dynamic> result = {};
-    for (int i = 0; i < list.length; i++) {
-      result['item$i'] = list[i];
-    }
-    return result;
-  }
 
-  Future<void> _saveText(int id) async {
+  Future<void> _saveText(int id, String title) async {
     final List<String> text = NoteBody.tmpText[id];
-    await _firestore.collection('NoteText').add({'Text': text});
+    //print(title);
+    await _firestore.collection(title).doc('text$id').set({'Text': text});
   }
 
   Future<void> _loadText() async {
-    final snapshot = await _firestore.collection('NoteText').get();
+    final snapshot = await _firestore.collection(widget.title).get();
     if (snapshot.docs.isNotEmpty) {
       final data = snapshot.docs.first.data();
       if (data.containsKey('Text')) {
