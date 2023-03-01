@@ -43,6 +43,16 @@ class _TextContainerState extends State<TextContainer> {
     final List<String> text = NoteBody.tmpText[id];
     //print(title);
     await _firestore.collection(title).doc('text$id').set({'Text': text});
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TextContainer(
+          id: id,
+          tmpText: text,
+          title: title,
+        ),
+      ),
+    );
   }
 
   Future<void> _loadText() async {

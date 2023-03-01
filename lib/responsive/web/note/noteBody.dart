@@ -16,6 +16,7 @@ class NoteBody extends StatefulWidget {
 }
 
 class _NoteBody extends State<NoteBody> {
+  late TextEditingController title;
   final buttonKey = GlobalKey();
   final textBoxKey = GlobalKey();
   bool _isTop = true;
@@ -31,6 +32,8 @@ class _NoteBody extends State<NoteBody> {
   @override
   void initState() {
     NoteBody.tmpText.add(List.generate(10, (index) => ''));
+    title = TextEditingController();
+
     super.initState();
     // Initialize pages with a single page.
     pages = [
@@ -42,8 +45,16 @@ class _NoteBody extends State<NoteBody> {
   }
 
   @override
+  void dispose() {
+    NoteBody.tmpText.clear();
+    NoteBody.tmpPaint.clear();
+    title.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final title = TextEditingController();
     final Size size = MediaQuery.of(context).size; // 設定左右間距比例
     final double Ratio = 0.1;
 
