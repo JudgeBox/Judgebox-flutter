@@ -101,8 +101,8 @@ class _NoteBody extends State<NoteBody> {
                   tmpText: NoteBody.tmpText[i],
                   title: title.text,
                 ).save();
-                Navigator.pop(context);
               }
+              Navigator.pop(context);
             },
             child: Text("Save"),
           ),
