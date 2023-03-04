@@ -7,12 +7,14 @@ import 'package:judgebox/responsive/web/note/noteBody.dart';
 class TextContainer extends StatefulWidget {
   final int id;
   final List<String> tmpText;
-  const TextContainer({Key? key, required this.id, required this.tmpText}) : super(key: key);
+  final String title;
+  const TextContainer({Key? key, required this.id, required this.tmpText, required this.title}) : super(key: key);
+
 
   @override
   State<TextContainer> createState() => _TextContainerState();
   @override
-  Future<void> save() => _TextContainerState()._saveText();
+  Future<void> save() => _TextContainerState()._saveText(id, title);
 }
 
 class _TextContainerState extends State<TextContainer> {
@@ -23,8 +25,9 @@ class _TextContainerState extends State<TextContainer> {
   void initState() {
     super.initState();
     for (int i = 0; i < 10; i++) {
-      _controllers.add(TextEditingController(text: widget.tmpText[i]));
+      _controllers.add(TextEditingController(text: NoteBody.tmpText[widget.id][i]));
     }
+    //_loadText();
   }
 
   @override
@@ -35,28 +38,44 @@ class _TextContainerState extends State<TextContainer> {
     super.dispose();
   }
 
-  Future<void> _saveText() async {
-    print("A");
-    await _firestore.collection('NoteText').add({'Text': NoteBody.tmpText[0]});
+
+  Future<void> _saveText(int id, String title) async {
+    final List<String> text = NoteBody.tmpText[id];
+    //print(title);
+    await _firestore.collection(title).doc('text$id').set({'Text': text});
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TextContainer(
+          id: id,
+          tmpText: text,
+          title: title,
+        ),
+      ),
+    );
   }
 
   Future<void> _loadText() async {
-    final snapshot = await _firestore.collection('NoteText').get();
+    final snapshot = await _firestore.collection(widget.title).get();
     if (snapshot.docs.isNotEmpty) {
       final data = snapshot.docs.first.data();
       if (data.containsKey('Text')) {
         final List<dynamic> text = data['Text'];
-        final List<List<String>> tmpText = List.castFrom<dynamic, List<String>>(text);
-        setState(() {
-          NoteBody.tmpText[widget.id] = tmpText[widget.id];
-        });
+        if (text != null) {
+          final List<String> tmpText = List.castFrom<dynamic, String>(text);
+          setState(() {
+            NoteBody.tmpText[widget.id] = tmpText;
+            for (int i = 0; i < 10; i++) {
+              _controllers[i] = TextEditingController(text: tmpText[i]);
+            }
+          });
+        }
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    _loadText();
     int id = widget.id;
     List<String> tmpText = widget.tmpText;
 
@@ -85,9 +104,6 @@ class _TextContainerState extends State<TextContainer> {
               }
             },
             onChanged: (value) {
-              if (value.contains('\n')) {
-                _focusNodes[index + 1].requestFocus();
-              }
               NoteBody.tmpText[id][index] = value;
             },
           ),

@@ -5,32 +5,39 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PainterContainer extends StatefulWidget {
   final int id;
-
-  const PainterContainer({Key? key, required this.id}) : super(key: key);
+  final String title;
+  const PainterContainer({Key? key, required this.id, required this.title}) : super(key: key);
 
   @override
   State<PainterContainer> createState() => _PainterContainer();
 
   @override
-  Future<void> save() => _PainterContainer()._savePoints();
+  Future<void> save() => _PainterContainer()._savePoints(id, title);
 }
 
 class _PainterContainer extends State<PainterContainer> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
+  void initState() {
+    super.initState();
+    PointPainter.points.add(<PaintData>[]);
+    //PointPainter.points.clear();
+    //_loadPoints();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    _loadPoints();
     int id = widget.id;
     return LayoutBuilder(
         builder: (context, constraints) {
           return CustomPaint(
               size: Size(constraints.maxWidth, constraints.maxWidth),
-              painter: PointPainter(),
+              painter: PointPainter(id),
               child: GestureDetector(
                 onPanUpdate: (details) {
                   setState(() {
-                    PointPainter.points.add(PaintData(
+                    PointPainter.points[id].add(PaintData(
                       position: details.localPosition,
                       color: Colors.red,
                       strokeWidth: 4.0,
@@ -44,21 +51,29 @@ class _PainterContainer extends State<PainterContainer> {
     );
   }
 
-  Future<void> _savePoints() async {
-    final List<Map<String, dynamic>> data = PointPainter.points.map((e) =>
+  Future<void> _savePoints(int id, String title) async {
+    final List<Map<String, dynamic>> data = PointPainter.points[id].map((e) =>
         e.toMap()).toList();
-    await _firestore.collection('points').add({'points': data});
+    await _firestore.collection(title).doc("paint$id").set({'points': data});
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PainterContainer(
+          id: id,
+          title: title,
+        ),
+      ),
+    );
   }
 
-  Future<void> _loadPoints() async {
-    final snapshot = await _firestore.collection('points').get();
-    if (snapshot.docs.isNotEmpty) {
-      final data = snapshot.docs.first.data();
-      if (data.containsKey('points')) {
-        final List<dynamic> points = data['points'];
+  Future<void> _loadPoints(int id, String title) async {
+    final snapshot = await _firestore.collection(title).doc("paint$id").get();
+    if (snapshot.exists) {
+      final List<dynamic>? points = snapshot.data()?['points'];
+      if (points != null) {
         setState(() {
           PointPainter.points.clear();
-          PointPainter.points.addAll(
+          PointPainter.points[id].addAll(
               points.map((e) => PaintData.fromMap(e)).toList());
         });
       }
@@ -100,12 +115,15 @@ class PaintData {
 }
 
 class PointPainter extends CustomPainter {
-  static List<PaintData> points = <PaintData>[];
+  static List<List<PaintData>> points = [];
+  final int id;
 
+  PointPainter(this.id);
   @override
   void paint(Canvas canvas, Size size) {
     var paint = Paint();
-    for (final point in points) {
+    if(points.length <= id) return;
+    for (final point in points[id]) {
       paint.color = point.color;
       paint.strokeWidth = point.strokeWidth;
       paint.strokeCap = point.strokeCap;
