@@ -35,48 +35,15 @@ class _WebBody extends State<WebBody> {
 
 
   }
-
-  late List<dynamic> _futureProblemList;
-  Future<void> getProblem() async {
-    print('try http request');
-
-    final response = await http.get(Uri.parse('http://localhost:3000/CF'));
-
-    if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      _futureProblemList = jsonResponse;
-      print(jsonResponse[0]);
-      // return jsonResponse;
-    } else {
-      throw Exception('Request failed with status: ${response.statusCode}.');
-    }
-
-    setState(() {});
-  }
-  
   @override
   void initState() {
     super.initState();
     _futureProblemList = [];
-
-    _loadData();
-  }
-
-  @override
-  void didChangeDependencies() {
-    final args = ModalRoute.of(context)?.settings.arguments;
-    if (args == true) {
-      setState(() {
-
-      });
-    }
-    super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
     final problemList = getProblem();
-
     return Scaffold(
       body: Container(
           padding: EdgeInsets.only(left: 200, right: 250),
