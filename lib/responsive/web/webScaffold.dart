@@ -25,7 +25,7 @@ class _WebScaffoldState extends State<WebScaffold> {
                 TextButton(
                   onPressed: () {
                     // This is the callback that will be called when the user taps on the text
-                    var destinationPage = NoteBody();
+                    var destinationPage = NoteBody(title: "");
                     // Push the destination page onto the navigation stack
                     Navigator.push(
                       context,

@@ -1,16 +1,21 @@
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:judgebox/constants.dart';
 import 'package:judgebox/responsive/web/note/paintBody.dart';
 import 'package:judgebox/responsive/web/note/textBody.dart';
+import 'package:judgebox/responsive/web/webBody.dart';
 
 class NoteBody extends StatefulWidget {
-  const NoteBody({Key? key}) : super(key: key);
   static List<List<String>> tmpText = <List<String>>[];
   static List<List<PaintData>> tmpPaint = <List<PaintData>>[];
+  static List<List<Widget>> pages = [];
+  static bool checkUpdate = false;
 
+  final String title;
+  const NoteBody({Key? key, required this.title}) : super(key: key);
   @override
   State<NoteBody> createState() => _NoteBody();
 }
@@ -19,7 +24,7 @@ class _NoteBody extends State<NoteBody> {
   late TextEditingController title;
   final buttonKey = GlobalKey();
   final textBoxKey = GlobalKey();
-  bool _isTop = true;
+  bool _isTop = true, _hasTitle = true;
 
   void _changeOrder() {
     setState(() {
@@ -27,29 +32,59 @@ class _NoteBody extends State<NoteBody> {
     });
   }
 
-  late List<List<Widget>> pages;
+  Future<void> saveTitle(String title) async {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    await _firestore.collection("title").doc("title").update({title: title});
+  }
+
+  Future<void> loadData(String title) async {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    var docs = await FirebaseFirestore.instance.collection(title).get();
+    final double len = docs.size / 2;
+    print(len);
+    for(int i = 0; i < len; i++) {
+      NoteBody.tmpText.add(List.generate(10, (index) => ''));
+      NoteBody.pages += [
+        [
+          PainterContainer(id: i, title: ""),
+          TextContainer(id: i, tmpText: NoteBody.tmpText[i], title: title),
+        ],
+      ];
+    }
+    setState(() {
+
+    });
+  }
+
 
   @override
   void initState() {
-    NoteBody.tmpText.add(List.generate(10, (index) => ''));
-    title = TextEditingController();
-
     super.initState();
-    // Initialize pages with a single page.
-    pages = [
-      [
-        PainterContainer(id: 0, title: ""),
-        TextContainer(id: 0, tmpText: NoteBody.tmpText[0], title: ""),
-      ],
-    ];
+    NoteBody.pages.clear();
+    if (widget.title == "") {
+      NoteBody.tmpText.add(List.generate(10, (index) => ''));
+      title = TextEditingController();
+      NoteBody.pages = [
+        [
+          PainterContainer(id: 0, title: ""),
+          TextContainer(id: 0, tmpText: NoteBody.tmpText[0], title: ""),
+        ],
+      ];
+    }
+    else {
+      NoteBody.tmpText.add(List.generate(10, (index) => ''));
+      _hasTitle = false;
+      title = TextEditingController();
+      title.text = widget.title;
+      loadData(widget.title);
+
+    }
+
   }
 
   @override
   void dispose() {
-    NoteBody.tmpText.clear();
-    NoteBody.tmpPaint.clear();
     title.dispose();
-
     super.dispose();
   }
 
@@ -65,12 +100,12 @@ class _NoteBody extends State<NoteBody> {
         backgroundColor: Colors.black26,
         title: Container(
           padding: EdgeInsets.symmetric(horizontal: screenPadding),
-          child: TextField(
+          child: _hasTitle ? TextField(
             controller: title,
             decoration: InputDecoration(
               hintText: 'Enter text here',
             ),
-          ),
+          ) : Text(title.text),
         ),
         actions: <Widget>[
           TextButton(
@@ -102,8 +137,12 @@ class _NoteBody extends State<NoteBody> {
                   title: title.text,
                 ).save();
               }
-              Navigator.pop(context);
-            },
+              NoteBody.pages.clear();
+              saveTitle(title.text);
+              WebBody().load();
+              Navigator.pop(context, true);
+
+              },
             child: Text("Save"),
           ),
         ],
@@ -119,7 +158,7 @@ class _NoteBody extends State<NoteBody> {
                     icon: const Icon(Icons.menu),
                     onPressed: () {
                       setState(() {
-                        pages = pages
+                        NoteBody.pages = NoteBody.pages
                             .map((page) => page.reversed.toList())
                             .toList();
                         //print(NoteBody.tmpText[0]);
@@ -131,9 +170,9 @@ class _NoteBody extends State<NoteBody> {
                     icon: const Icon(Icons.add),
                     onPressed: () {
                       setState(() {
-                        int len = pages.length;
+                        int len = NoteBody.pages.length;
                         NoteBody.tmpText.add(List.generate(10, (index) => ''));
-                        pages += _isTop
+                        NoteBody.pages += _isTop
                             ? [
                                 [
                                   PainterContainer(
@@ -167,7 +206,7 @@ class _NoteBody extends State<NoteBody> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: pages.length,
+              itemCount: NoteBody.pages.length,
               itemBuilder: (context, index) {
                 return Container(
                   color: Colors.white,
@@ -183,7 +222,7 @@ class _NoteBody extends State<NoteBody> {
                               width: MediaQuery.of(context).size.width,
                               height: MediaQuery.of(context).size.height / 1.5,
                               child: Stack(
-                                children: pages[index],
+                                children: NoteBody.pages[index],
                               ),
                             )
                           ],

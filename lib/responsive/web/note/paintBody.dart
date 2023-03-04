@@ -23,7 +23,8 @@ class _PainterContainer extends State<PainterContainer> {
     super.initState();
     PointPainter.points.add(<PaintData>[]);
     //PointPainter.points.clear();
-    //_loadPoints();
+    if(widget.title != "")
+      _loadPoints(widget.id, widget.title);
   }
 
   @override
@@ -55,15 +56,6 @@ class _PainterContainer extends State<PainterContainer> {
     final List<Map<String, dynamic>> data = PointPainter.points[id].map((e) =>
         e.toMap()).toList();
     await _firestore.collection(title).doc("paint$id").set({'points': data});
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PainterContainer(
-          id: id,
-          title: title,
-        ),
-      ),
-    );
   }
 
   Future<void> _loadPoints(int id, String title) async {

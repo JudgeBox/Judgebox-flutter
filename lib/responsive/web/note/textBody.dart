@@ -15,6 +15,8 @@ class TextContainer extends StatefulWidget {
   State<TextContainer> createState() => _TextContainerState();
   @override
   Future<void> save() => _TextContainerState()._saveText(id, title);
+  @override
+  Future<void> load() => _TextContainerState()._loadText(id, title);
 }
 
 class _TextContainerState extends State<TextContainer> {
@@ -27,7 +29,10 @@ class _TextContainerState extends State<TextContainer> {
     for (int i = 0; i < 10; i++) {
       _controllers.add(TextEditingController(text: NoteBody.tmpText[widget.id][i]));
     }
-    //_loadText();
+    if(widget.title != "") {
+      print(widget.title);
+      _loadText(widget.id, widget.title);
+    }
   }
 
   @override
@@ -43,33 +48,26 @@ class _TextContainerState extends State<TextContainer> {
     final List<String> text = NoteBody.tmpText[id];
     //print(title);
     await _firestore.collection(title).doc('text$id').set({'Text': text});
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TextContainer(
-          id: id,
-          tmpText: text,
-          title: title,
-        ),
-      ),
-    );
   }
 
-  Future<void> _loadText() async {
-    final snapshot = await _firestore.collection(widget.title).get();
-    if (snapshot.docs.isNotEmpty) {
-      final data = snapshot.docs.first.data();
-      if (data.containsKey('Text')) {
-        final List<dynamic> text = data['Text'];
-        if (text != null) {
-          final List<String> tmpText = List.castFrom<dynamic, String>(text);
-          setState(() {
-            NoteBody.tmpText[widget.id] = tmpText;
-            for (int i = 0; i < 10; i++) {
-              _controllers[i] = TextEditingController(text: tmpText[i]);
-            }
-          });
+  Future<void> _loadText(int id, String title) async {
+    final snapshot = await FirebaseFirestore.instance.collection(title).doc("text$id").get();
+    final data = snapshot.data();
+    if(data != null) {
+      if(id != 0) {
+        NoteBody.tmpText.add(List.generate(10, (index) => ''));
+      }
+      final List<dynamic> text = data.values.first;
+      if (text != null) {
+        final List<String> tmpText = List.castFrom<dynamic, String>(text);
+        NoteBody.tmpText[id] = tmpText;
+        print(NoteBody.tmpText);
+        for(int i = 0; i < 10; i++) {
+          _controllers[i] = TextEditingController(text: tmpText[i]);
         }
+        setState(() {
+
+        });
       }
     }
   }
@@ -77,7 +75,6 @@ class _TextContainerState extends State<TextContainer> {
   @override
   Widget build(BuildContext context) {
     int id = widget.id;
-    List<String> tmpText = widget.tmpText;
 
     int listLength = 10;
     List<FocusNode> _focusNodes = List<FocusNode>.generate(listLength, (int index) => FocusNode());
