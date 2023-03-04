@@ -37,6 +37,7 @@ dependencies:
   path_provider: ^2.0.12
   firebase_core: ^2.6.1
   cloud_firestore: ^4.4.2
+  mongo_dart: ^0.8.2
 
 dev_dependencies:
   flutter_test:
