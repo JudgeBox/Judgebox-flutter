@@ -46,24 +46,30 @@ class _TextContainerState extends State<TextContainer> {
 
   Future<void> _saveText(int id, String title) async {
     final List<String> text = NoteBody.tmpText[id];
-    //print(title);
+    print(NoteBody.tmpText);
+    await _firestore.collection(title).doc("text$id").delete();
     await _firestore.collection(title).doc('text$id').set({'Text': text});
+    NoteBody.tmpText[id].clear();
   }
 
   Future<void> _loadText(int id, String title) async {
     final snapshot = await FirebaseFirestore.instance.collection(title).doc("text$id").get();
     final data = snapshot.data();
+
     if(data != null) {
-      if(id != 0) {
-        NoteBody.tmpText.add(List.generate(10, (index) => ''));
-      }
       final List<dynamic> text = data.values.first;
       if (text != null) {
         final List<String> tmpText = List.castFrom<dynamic, String>(text);
-        NoteBody.tmpText[id] = tmpText;
+        print(tmpText);
+
+        //NoteBody.tmpText[id].clear();
+        //NoteBody.tmpText[id] = List.generate(10, (index) => '');
         print(NoteBody.tmpText);
         for(int i = 0; i < 10; i++) {
-          _controllers[i] = TextEditingController(text: tmpText[i]);
+          if(tmpText[i] != "") {
+            NoteBody.tmpText[id][i] = tmpText[i];
+            _controllers[i] = TextEditingController(text: tmpText[i]);
+          }
         }
         setState(() {
 

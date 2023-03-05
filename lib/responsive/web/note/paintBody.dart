@@ -41,7 +41,7 @@ class _PainterContainer extends State<PainterContainer> {
                     PointPainter.points[id].add(PaintData(
                       position: details.localPosition,
                       color: Colors.red,
-                      strokeWidth: 4.0,
+                      strokeWidth: 10.0,
                       strokeCap: StrokeCap.round,
                     ));
                   });
@@ -55,6 +55,7 @@ class _PainterContainer extends State<PainterContainer> {
   Future<void> _savePoints(int id, String title) async {
     final List<Map<String, dynamic>> data = PointPainter.points[id].map((e) =>
         e.toMap()).toList();
+    await _firestore.collection(title).doc("paint$id").delete();
     await _firestore.collection(title).doc("paint$id").set({'points': data});
   }
 
@@ -64,7 +65,7 @@ class _PainterContainer extends State<PainterContainer> {
       final List<dynamic>? points = snapshot.data()?['points'];
       if (points != null) {
         setState(() {
-          PointPainter.points.clear();
+          //PointPainter.points[id] = [];
           PointPainter.points[id].addAll(
               points.map((e) => PaintData.fromMap(e)).toList());
         });
