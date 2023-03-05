@@ -20,8 +20,23 @@ class WebBody extends StatefulWidget {
 class _WebBody extends State<WebBody> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   late List<String> noteData = [];
+  late List<dynamic> _futureProblemList;
 
-  get http => null;
+  Future<void> getProblem() async {
+
+    final response = await http.get(Uri.parse('http://localhost:3000/CF'));
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      _futureProblemList = jsonResponse;
+      print(jsonResponse[0]);
+      // return jsonResponse;
+    } else {
+      throw Exception('Request failed with status: ${response.statusCode}.');
+    }
+
+    setState(() {});
+  }
 
   Future<void> _loadData() async {
     final snapshot = await _firestore.collection("title").doc("title").get();
@@ -32,18 +47,21 @@ class _WebBody extends State<WebBody> {
       }
     }
     print(noteData);
+    setState(() {
 
+    });
 
   }
   @override
   void initState() {
     super.initState();
     _futureProblemList = [];
+    _loadData();
   }
 
   @override
   Widget build(BuildContext context) {
-    final problemList = getProblem();
+    //final problemList = getProblem();
     return Scaffold(
       body: Container(
           padding: EdgeInsets.only(left: 200, right: 250),
@@ -83,6 +101,7 @@ class _WebBody extends State<WebBody> {
                     scrollDirection: Axis.horizontal,
                     itemCount: (constraints.maxWidth / 300).toInt(),
                     itemBuilder: (BuildContext context, int index) {
+                      print(noteData);
                       if (index >= noteData.length) return Container();
                       String title = noteData[noteData.length - 1 - index];
                       return GestureDetector(
@@ -142,14 +161,14 @@ class _WebBody extends State<WebBody> {
                 shrinkWrap: true,
                 itemCount: (constraints.maxHeight / 65).toInt(),
                 itemBuilder: (BuildContext context, int index) {
-                  if (index >= _futureProblemList.length) {
+                  //if (index >= _futureProblemList.length) {
                     return ListTile(
                       leading: Icon(Icons.add_to_home_screen),
                       title: Text("Loading..."),
                       trailing: Icon(Icons.keyboard_arrow_right),
                     );
-                  }
-                  return ListTile(
+                  //}
+                  /*return ListTile(
                     leading: Icon(Icons.add_to_home_screen),
                     title: Text(_futureProblemList[index]['Id'].toString() +
                         ": " +
@@ -159,7 +178,11 @@ class _WebBody extends State<WebBody> {
                 },
                 separatorBuilder: (BuildContext context, int index) {
                   return Divider(color: Colors.blue);
-                },
+                },*/},
+                  separatorBuilder: (BuildContext context, int index) {
+                    return Divider(color: Colors.blue);
+                  }
+
               );
             })),
           ])),
