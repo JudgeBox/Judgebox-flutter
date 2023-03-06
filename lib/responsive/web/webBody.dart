@@ -6,6 +6,7 @@ import 'package:judgebox/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'note/noteBody.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WebBody extends StatefulWidget {
   const WebBody({Key? key}) : super(key: key);
@@ -29,7 +30,7 @@ class _WebBody extends State<WebBody> {
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
       _futureProblemList = jsonResponse;
-      print(jsonResponse[0]);
+      print(jsonResponse.length);
       // return jsonResponse;
     } else {
       throw Exception('Request failed with status: ${response.statusCode}.');
@@ -41,29 +42,25 @@ class _WebBody extends State<WebBody> {
   Future<void> _loadData() async {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
     final DocumentSnapshot<Map<String, dynamic>> snapshot =
-    await _firestore.collection("title").doc("title").get();
+        await _firestore.collection("title").doc("title").get();
     final List<dynamic> titles = snapshot.data()?['title'] ?? [];
 
     noteData = List<String>.from(titles.map((e) => e.toString()));
     //print(noteData);
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
+    getProblem();
     _futureProblemList = [];
-    _stream = FirebaseFirestore.instance
-        .collection('title')
-        .doc('title')
-        .snapshots();
+    _stream =
+        FirebaseFirestore.instance.collection('title').doc('title').snapshots();
   }
 
   @override
   Widget build(BuildContext context) {
-    //final problemList = getProblem();
     return Scaffold(
       body: Container(
           padding: EdgeInsets.only(left: 200, right: 250),
@@ -103,10 +100,11 @@ class _WebBody extends State<WebBody> {
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return CircularProgressIndicator();
-                      }
-                      else {
-                        final List<dynamic> titles = snapshot.data!?['title'] ?? [];
-                        noteData = List<String>.from(titles.map((e) => e.toString()));
+                      } else {
+                        final List<dynamic> titles =
+                            snapshot.data!?['title'] ?? [];
+                        noteData =
+                            List<String>.from(titles.map((e) => e.toString()));
                         return LayoutBuilder(builder: (context, constraints) {
                           return ListView.separated(
                             scrollDirection: Axis.horizontal,
@@ -114,19 +112,19 @@ class _WebBody extends State<WebBody> {
                             itemBuilder: (BuildContext context, int index) {
                               print(noteData);
                               if (index >= noteData.length) return Container();
-                              String title = noteData[noteData.length - index -
-                                  1];
+                              String title =
+                                  noteData[noteData.length - index - 1];
                               return GestureDetector(
                                   onTap: () {
-                                    var destinationPage = NoteBody(
-                                      title: title, New: false);
+                                    var destinationPage =
+                                        NoteBody(title: title, New: false);
                                     NoteBody.pages.clear();
                                     // Push the destination page onto the navigation stack
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (
-                                              context) => destinationPage),
+                                          builder: (context) =>
+                                              destinationPage),
                                     );
                                   },
                                   child: Container(
@@ -140,9 +138,9 @@ class _WebBody extends State<WebBody> {
                                     ),
                                   ));
                             },
-                            separatorBuilder: (BuildContext context,
-                                int index) =>
-                                SizedBox(width: 50),
+                            separatorBuilder:
+                                (BuildContext context, int index) =>
+                                    SizedBox(width: 50),
                           );
                         });
                       }
@@ -179,30 +177,42 @@ class _WebBody extends State<WebBody> {
                   shrinkWrap: true,
                   itemCount: (constraints.maxHeight / 65).toInt(),
                   itemBuilder: (BuildContext context, int index) {
-                    //if (index >= _futureProblemList.length) {
-                    return ListTile(
-                      leading: Icon(Icons.add_to_home_screen),
-                      title: Text("Loading..."),
-                      trailing: Icon(Icons.keyboard_arrow_right),
-                    );
-                    //}
-                    /*return ListTile(
-                    leading: Icon(Icons.add_to_home_screen),
-                    title: Text(_futureProblemList[index]['Id'].toString() +
-                        ": " +
-                        _futureProblemList[index]['Name'].toString()),
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return Divider(color: Colors.blue);
-                },*/
+                    if (index >= _futureProblemList.length) {
+                      print("Loading");
+                      return ListTile(
+                        leading: Icon(Icons.add_to_home_screen),
+                        title: Text("Loading..."),
+                        trailing: Icon(Icons.keyboard_arrow_right),
+                      );
+                    } else {
+                      return ListTile(
+                        leading: Icon(Icons.add_to_home_screen),
+                        title: Text(_futureProblemList[index]['Id'].toString() +
+                            ": " +
+                            _futureProblemList[index]['Name'].toString()),
+                        onTap: () =>
+                            launch(_futureProblemList[index]['URL'].toString()),
+                        trailing: IconButton(
+                          icon: Icon(Icons.keyboard_arrow_right),
+                          onPressed: () {
+                            var destinationPage = NoteBody(
+                                title: _futureProblemList[index]['Id'],
+                                New: true);
+                            NoteBody.pages.clear();
+                            // Push the destination page onto the navigation stack
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => destinationPage),
+                            );
+                          },
+                        ),
+                      );
+                    }
                   },
                   separatorBuilder: (BuildContext context, int index) {
                     return Divider(color: Colors.blue);
-                  }
-
-              );
+                  });
             })),
           ])),
     );
