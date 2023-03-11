@@ -8,6 +8,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'note/noteBody.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:flutter/services.dart' show rootBundle;
+
 class WebBody extends StatefulWidget {
   const WebBody({Key? key}) : super(key: key);
 
@@ -25,6 +27,14 @@ class _WebBody extends State<WebBody> {
   late List<dynamic> _futureProblemList;
 
   Future<void> getProblem() async {
+    print("trying request");
+
+    final value = await rootBundle.loadString('json/problem.json');
+    _futureProblemList = json.decode(value);
+    print(_futureProblemList.length);
+    setState(() {});
+    return;
+
     final response = await http.get(Uri.parse('http://localhost:3000/CF'));
 
     if (response.statusCode == 200) {
@@ -179,7 +189,7 @@ class _WebBody extends State<WebBody> {
                   itemBuilder: (BuildContext context, int index) {
                     if (index >= _futureProblemList.length) {
                       print("Loading");
-                      return ListTile(
+                      return const ListTile(
                         leading: Icon(Icons.add_to_home_screen),
                         title: Text("Loading..."),
                         trailing: Icon(Icons.keyboard_arrow_right),
@@ -197,7 +207,7 @@ class _WebBody extends State<WebBody> {
                           onPressed: () {
                             var destinationPage = NoteBody(
                                 title: _futureProblemList[index]['Id'],
-                                New: true);
+                                New: false);
                             NoteBody.pages.clear();
                             // Push the destination page onto the navigation stack
                             Navigator.push(
