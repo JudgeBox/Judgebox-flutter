@@ -20,6 +20,9 @@ class WebBody extends StatefulWidget {
   State<WebBody> createState() => _WebBody();
 }
 
+int cnt = 0;
+int cnt2 = 0;
+
 class _WebBody extends State<WebBody> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _stream;
@@ -91,12 +94,22 @@ class _WebBody extends State<WebBody> {
                   Container(
                     alignment: Alignment.topRight,
                     child: IconButton(
-                        icon: Icon(Icons.arrow_left), onPressed: () {}),
+                        icon: Icon(Icons.arrow_left),
+                        onPressed: () {
+                          setState(() {
+                            if (cnt2 > 0) cnt2 -= 1;
+                          });
+                        }),
                   ),
                   Container(
                     alignment: Alignment.topRight,
                     child: IconButton(
-                        icon: Icon(Icons.arrow_right), onPressed: () {}),
+                        icon: Icon(Icons.arrow_right),
+                        onPressed: () {
+                          setState(() {
+                            cnt2 += 1;
+                          });
+                        }),
                   ),
                   SizedBox(width: 30),
                 ])
@@ -121,6 +134,8 @@ class _WebBody extends State<WebBody> {
                             itemCount: (constraints.maxWidth / 300).toInt(),
                             itemBuilder: (BuildContext context, int index) {
                               print(noteData);
+                              index +=
+                                  (constraints.maxWidth / 300).toInt() * cnt2;
                               if (index >= noteData.length) return Container();
                               String title =
                                   noteData[noteData.length - index - 1];
@@ -170,12 +185,22 @@ class _WebBody extends State<WebBody> {
                   Container(
                     alignment: Alignment.topRight,
                     child: IconButton(
-                        icon: Icon(Icons.arrow_left), onPressed: () {}),
+                        icon: Icon(Icons.arrow_left),
+                        onPressed: () {
+                          setState(() {
+                            if (cnt > 0) cnt -= 1;
+                          });
+                        }),
                   ),
                   Container(
                     alignment: Alignment.topRight,
                     child: IconButton(
-                        icon: Icon(Icons.arrow_right), onPressed: () {}),
+                        icon: Icon(Icons.arrow_right),
+                        onPressed: () {
+                          setState(() {
+                            cnt += 1;
+                          });
+                        }),
                   ),
                   SizedBox(width: 30),
                 ])
@@ -187,6 +212,7 @@ class _WebBody extends State<WebBody> {
                   shrinkWrap: true,
                   itemCount: (constraints.maxHeight / 65).toInt(),
                   itemBuilder: (BuildContext context, int index) {
+                    index += cnt * (constraints.maxHeight / 65).toInt();
                     if (index >= _futureProblemList.length) {
                       print("Loading");
                       return const ListTile(
@@ -196,7 +222,12 @@ class _WebBody extends State<WebBody> {
                       );
                     } else {
                       return ListTile(
-                        leading: Icon(Icons.add_to_home_screen),
+                        leading: Image.asset(
+                          "images/" +
+                              _futureProblemList[index]['OJ'].toString() +
+                              ".png",
+                          width: 50,
+                        ),
                         title: Text(_futureProblemList[index]['Id'].toString() +
                             ": " +
                             _futureProblemList[index]['Name'].toString()),
@@ -207,7 +238,7 @@ class _WebBody extends State<WebBody> {
                           onPressed: () {
                             var destinationPage = NoteBody(
                                 title: _futureProblemList[index]['Id'],
-                                New: false);
+                                New: true);
                             NoteBody.pages.clear();
                             // Push the destination page onto the navigation stack
                             Navigator.push(

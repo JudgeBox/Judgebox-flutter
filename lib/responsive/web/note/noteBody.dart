@@ -20,7 +20,8 @@ class NoteBody extends StatefulWidget {
 
   final String title;
   final bool New;
-  const NoteBody({Key? key, required this.title, required this.New}) : super(key: key);
+  const NoteBody({Key? key, required this.title, required this.New})
+      : super(key: key);
 
   @override
   State<NoteBody> createState() => _NoteBody();
@@ -70,11 +71,12 @@ class _NoteBody extends State<NoteBody> {
     if (widget.New == true) {
       NoteBody.tmpText.clear();
       NoteBody.tmpText.add(List.generate(10, (index) => ''));
-      title = TextEditingController();
+      title = TextEditingController(text: widget.title);
       NoteBody.pages = [
         [
           PainterContainer(id: 0, title: widget.title),
-          TextContainer(id: 0, tmpText: NoteBody.tmpText[0], title: widget.title),
+          TextContainer(
+              id: 0, tmpText: NoteBody.tmpText[0], title: widget.title),
         ],
       ];
     } else {
@@ -138,9 +140,9 @@ class _NoteBody extends State<NoteBody> {
               }
               NoteBody.pages = [];
               saveTitle(title.text);
+
               //WebBody().load();
               Navigator.pop(context, true);
-
             },
             child: Text("Save"),
           ),

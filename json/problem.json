@@ -1,15 +1,30 @@
 [{
     "OJ": "Codeforces",
-    "URL": "https://codeforces.com/contest/1765/problem/N",
-    "Id": "1765N",
-    "Name": "Number Reduction",
+    "URL": "https://codeforces.com/contest/1802/problem/A",
+    "Id": "1802A",
+    "Name": "Likes",
     "__v": 0
 }, {
     "OJ": "Codeforces",
-    "URL": "https://codeforces.com/contest/1765/problem/M",
-    "Id": "1765M",
-    "Name": "Minimum LCM",
+    "URL": "https://codeforces.com/contest/1802/problem/B",
+    "Id": "1802B",
+    "Name": "Settlement of Guinea Pigs",
     "__v": 0
+}, {
+    "OJ": "AtCoder", 
+    "URL": "https://atcoder.jp/contests/abc201/tasks/abc201_d",
+    "Id": "abc201_d",
+    "Name": "Game in Momotetsu World"
+}, {
+    "OJ": "ZeroJudge",
+    "URL": "https://zerojudge.tw/ShowProblem?problemid=a001",
+    "Id": "a001",
+    "Name": "哈囉"
+}, {
+    "OJ": "CSES", 
+    "URL": "https://cses.fi/problemset/task/1637",
+    "Id": "1637",
+    "Name": "Removing Digits"
 }, {
     "OJ": "Codeforces",
     "URL": "https://codeforces.com/contest/1765/problem/L",
